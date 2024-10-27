@@ -8,7 +8,7 @@ import {
 export class TmdbApi implements ICredentialType {
 	name = 'tmdbApi';
 	displayName = 'TMDB API';
-	icon = 'file:tmdb.svg';
+	iconUrl = 'file:tmdb.svg';
 	documentationUrl = 'https://developer.themoviedb.org/reference/intro/getting-started';
 	properties: INodeProperties[] = [
 		{
