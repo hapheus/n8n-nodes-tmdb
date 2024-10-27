@@ -3,7 +3,20 @@
   "version": "0.1.0",
   "description": "n8n-nodes-tmdb enables seamless integration with The Movie Database (TMDb) in n8n workflows. Access comprehensive movie data effortlessly.",
   "keywords": [
-    "n8n-community-node-package"
+    "n8n-community-node-package",
+    "n8n",
+    "tmdb",
+    "movie-database",
+    "movie-data",
+    "n8n-workflow",
+    "tv-shows",
+    "movie-integration",
+    "media-api",
+    "automation",
+    "n8n-plugin",
+    "api-integration",
+    "typescript",
+    "nodejs"
   ],
   "license": "MIT",
   "homepage": "",

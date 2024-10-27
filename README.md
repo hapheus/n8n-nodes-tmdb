@@ -1,47 +1,41 @@
-![Banner image](https://user-images.githubusercontent.com/10284570/173569848-c624317f-42b1-45a6-ab09-f0ea3c247648.png)
+# n8n-nodes-tmdb
 
-# n8n-nodes-starter
+This project integrates [TMDb (The Movie Database)](https://www.themoviedb.org/) into [n8n](https://n8n.io/) workflows, allowing users to access comprehensive movie data and manage their workflows seamlessly.
 
-This repo contains example nodes to help you get started building your own custom integrations for [n8n](n8n.io). It includes the node linter and other dependencies.
+## Features
 
-To make your custom node available to the community, you must create it as an npm package, and [submit it to the npm registry](https://docs.npmjs.com/packages-and-modules/contributing-packages-to-the-registry).
+- Retrieve movie details, cast, and crew information.
+- Search movies by title, genre, and more.
+- Get recommendations based on movies or TV shows.
+- Access TV show details and seasons.
 
 ## Prerequisites
 
-You need the following installed on your development machine:
+- [n8n](https://n8n.io/) installed (Node.js required)
+- TMDb API Key (available through TMDb account)
 
-* [git](https://git-scm.com/downloads)
-* Node.js and npm. Minimum version Node 16. You can find instructions on how to install both using nvm (Node Version Manager) for Linux, Mac, and WSL [here](https://github.com/nvm-sh/nvm). For Windows users, refer to Microsoft's guide to [Install NodeJS on Windows](https://docs.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-windows).
-* Install n8n with:
-	```
-	npm install n8n -g
-	```
-* Recommended: follow n8n's guide to [set up your development environment](https://docs.n8n.io/integrations/creating-nodes/build/node-development-environment/).
+## Installation
 
+1. Open n8n and navigate to **Settings** > **Community Nodes**.
+2. Search for `n8n-nodes-tmdb` and install the package directly.
+3. Restart n8n to apply the changes.
 
-## Using this starter
+## Usage
 
-These are the basic steps for working with the starter. For detailed guidance on creating and publishing nodes, refer to the [documentation](https://docs.n8n.io/integrations/creating-nodes/).
+- Configure the TMDb credentials in n8n using your API key.
+- Use the provided nodes in your n8n workflows to integrate TMDb data retrieval seamlessly.
 
-1. [Generate a new repository](https://github.com/n8n-io/n8n-nodes-starter/generate) from this template repository.
-2. Clone your new repo:
-    ```
-    git clone https://github.com/<your organization>/<your-repo-name>.git
-    ```
-3. Run `npm i` to install dependencies.
-4. Open the project in your editor.
-5. Browse the examples in `/nodes` and `/credentials`. Modify the examples, or replace them with your own nodes.
-6. Update the `package.json` to match your details.
-7. Run `npm run lint` to check for errors or `npm run lintfix` to automatically fix errors when possible.
-8. Test your node locally. Refer to [Run your node locally](https://docs.n8n.io/integrations/creating-nodes/test/run-node-locally/) for guidance.
-9. Replace this README with documentation for your node. Use the [README_TEMPLATE](README_TEMPLATE.md) to get started.
-10. Update the LICENSE file to use your details.
-11. [Publish](https://docs.npmjs.com/packages-and-modules/contributing-packages-to-the-registry) your package to npm.
+## Contributing
 
-## More information
-
-Refer to our [documentation on creating nodes](https://docs.n8n.io/integrations/creating-nodes/) for detailed information on building your own nodes.
+1. Fork the repository.
+2. Create a new feature branch.
+3. Submit a pull request with a detailed description.
 
 ## License
 
-[MIT](https://github.com/n8n-io/n8n-nodes-starter/blob/master/LICENSE.md)
+This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
+
+## Acknowledgments
+
+- Thanks to [TMDb](https://www.themoviedb.org/) for providing an extensive movie database.
+- Inspired by the n8n community and its commitment to automation.
