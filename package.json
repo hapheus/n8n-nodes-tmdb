@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-tmdb",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "n8n-nodes-tmdb enables seamless integration with The Movie Database (TMDb) in n8n workflows. Access comprehensive movie data effortlessly.",
   "keywords": [
     "n8n-community-node-package",
