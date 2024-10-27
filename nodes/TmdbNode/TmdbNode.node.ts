@@ -10,6 +10,7 @@ import { getCompany } from './CompanyFunctions';
 import { getMovie } from './MovieFunctions';
 import { getPerson } from './PersonFunctions';
 import { getTv } from './TvFunctions';
+import { getMovieList } from './MovieListFunctions';
 
 export class TmdbNode implements INodeType {
 	description: INodeTypeDescription = {
@@ -41,6 +42,7 @@ export class TmdbNode implements INodeType {
 					{ name: 'Get Collection', value: 'get_collection' },
 					{ name: 'Get Company', value: 'get_company' },
 					{ name: 'Get Movie', value: 'get_movie' },
+					{ name: 'Get Movie List', value: 'get_movie_list' },
 					{ name: 'Get Person', value: 'get_person' },
 					{ name: 'Get TV', value: 'get_tv' },
 				],
@@ -155,6 +157,46 @@ export class TmdbNode implements INodeType {
 					},
 				},
 			},
+			{
+				displayName: 'Movie List Type',
+				name: 'movie_list_type',
+				type: 'options',
+				options: [
+					{ name: 'Now Playing', value: 'now_playing' },
+					{ name: 'Popular', value: 'popular' },
+					{ name: 'Top Rated', value: 'top_rated' },
+					{ name: 'Upcoming', value: 'upcoming' },
+				],
+				default: 'now_playing',
+				displayOptions: {
+					show: {
+						'/operation': ['get_movie_list'],
+					},
+				},
+			},
+			{
+				displayName: 'Page',
+				name: 'page',
+				type: 'number',
+				default: 1,
+				displayOptions: {
+					show: {
+						'/operation': ['get_movie_list'],
+					},
+				},
+			},
+			{
+				displayName: 'Region',
+				name: 'region',
+				type: 'string',
+				default: '',
+				placeholder: 'ISO-3166-1 code',
+				displayOptions: {
+					show: {
+						'/operation': ['get_movie_list'],
+					},
+				},
+			},
 		],
 	};
 
@@ -185,6 +227,9 @@ export class TmdbNode implements INodeType {
 						break;
 					case 'get_tv':
 						item.json = await getTv(this, itemIndex);
+						break;
+					case 'get_movie_list':
+						item.json = await getMovieList(this, itemIndex);
 						break;
 				}
 			} catch (error) {
