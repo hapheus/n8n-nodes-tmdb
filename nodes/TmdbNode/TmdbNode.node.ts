@@ -156,6 +156,39 @@ export class TmdbNode implements INodeType {
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		const items = this.getInputData();
 
+		const getUrls = function (filePath: string, sizes: string[]): Record<string, string> {
+			const baseUrl = 'https://image.tmdb.org/t/p/';
+			const urls: Record<string, string> = {};
+			sizes.forEach((size) => {
+				urls[size] = `${baseUrl}${size}/${filePath}`;
+			});
+			return urls;
+		};
+
+		const getPosterUrls = function (filePath: string): Record<string, string> {
+			const posterSizes = ['original', 'w92', 'w154', 'w185', 'w342', 'w500', 'w780'];
+			return getUrls(filePath, posterSizes);
+		};
+		const getLogoUrls = function (filePath: string): Record<string, string> {
+			const logoSizes = ['original', 'w45', 'w92', 'w154', 'w185', 'w300', 'w500'];
+			return getUrls(filePath, logoSizes);
+		};
+
+		const getBackdropUrls = function (filePath: string): Record<string, string> {
+			const backdropSizes = ['original', 'w300', 'w780', 'w1280'];
+			return getUrls(filePath, backdropSizes);
+		};
+
+		const getProfileUrls = function (filePath: string): Record<string, string> {
+			const profileSizes = ['original', 'w45', 'w185', 'h632'];
+			return getUrls(filePath, profileSizes);
+		};
+
+		const getStillUrls = function (filePath: string): Record<string, string> {
+			const stillSizes = ['original', 'w92', 'w185', 'w300'];
+			return getUrls(filePath, stillSizes);
+		};
+
 		let item: INodeExecutionData;
 		let operation: string;
 
@@ -189,25 +222,12 @@ export class TmdbNode implements INodeType {
 							getCollectionDetailResponse.images.backdrops =
 								getCollectionDetailResponse.images?.backdrops?.map((backdrop: any) => ({
 									...backdrop,
-									urls: {
-										original: `https://image.tmdb.org/t/p/original/${backdrop.file_path}`,
-										w300: `https://image.tmdb.org/t/p/w300/${backdrop.file_path}`,
-										w780: `https://image.tmdb.org/t/p/w780/${backdrop.file_path}`,
-										w1280: `https://image.tmdb.org/t/p/w1280/${backdrop.file_path}`,
-									},
+									urls: getBackdropUrls(backdrop.file_path),
 								}));
 							getCollectionDetailResponse.images.posters =
 								getCollectionDetailResponse.images?.posters?.map((poster: any) => ({
 									...poster,
-									urls: {
-										original: `https://image.tmdb.org/t/p/original/${poster.file_path}`,
-										w92: `https://image.tmdb.org/t/p/w92/${poster.file_path}`,
-										w154: `https://image.tmdb.org/t/p/w154/${poster.file_path}`,
-										w185: `https://image.tmdb.org/t/p/w185/${poster.file_path}`,
-										w342: `https://image.tmdb.org/t/p/w342/${poster.file_path}`,
-										w500: `https://image.tmdb.org/t/p/w500/${poster.file_path}`,
-										w780: `https://image.tmdb.org/t/p/w780/${poster.file_path}`,
-									},
+									urls: getPosterUrls(poster.file_path),
 								}));
 						}
 
@@ -215,25 +235,8 @@ export class TmdbNode implements INodeType {
 							getCollectionDetailResponse.parts = getCollectionDetailResponse.parts.map(
 								(part: any) => ({
 									...part,
-									poster_urls: part.poster_path
-										? {
-												original: `https://image.tmdb.org/t/p/original/${part.poster_path}`,
-												w92: `https://image.tmdb.org/t/p/w92/${part.poster_path}`,
-												w154: `https://image.tmdb.org/t/p/w154/${part.poster_path}`,
-												w185: `https://image.tmdb.org/t/p/w185/${part.poster_path}`,
-												w342: `https://image.tmdb.org/t/p/w342/${part.poster_path}`,
-												w500: `https://image.tmdb.org/t/p/w500/${part.poster_path}`,
-												w780: `https://image.tmdb.org/t/p/w780/${part.poster_path}`,
-											}
-										: null,
-									backdrop_urls: part.backdrop_path
-										? {
-												original: `https://image.tmdb.org/t/p/original/${part.backdrop_path}`,
-												w300: `https://image.tmdb.org/t/p/w300/${part.backdrop_path}`,
-												w780: `https://image.tmdb.org/t/p/w780/${part.backdrop_path}`,
-												w1280: `https://image.tmdb.org/t/p/w1280/${part.backdrop_path}`,
-											}
-										: null,
+									poster_urls: part.poster_path ? getPosterUrls(part.poster_path) : null,
+									backdrop_urls: part.backdrop_path ? getBackdropUrls(part.backdrop_path) : null,
 								}),
 							);
 						}
@@ -241,23 +244,10 @@ export class TmdbNode implements INodeType {
 						item.json = {
 							...getCollectionDetailResponse,
 							poster_urls: getCollectionDetailResponse.poster_path
-								? {
-										original: `https://image.tmdb.org/t/p/original/${getCollectionDetailResponse.poster_path}`,
-										w92: `https://image.tmdb.org/t/p/w92/${getCollectionDetailResponse.poster_path}`,
-										w154: `https://image.tmdb.org/t/p/w154/${getCollectionDetailResponse.poster_path}`,
-										w185: `https://image.tmdb.org/t/p/w185/${getCollectionDetailResponse.poster_path}`,
-										w342: `https://image.tmdb.org/t/p/w342/${getCollectionDetailResponse.poster_path}`,
-										w500: `https://image.tmdb.org/t/p/w500/${getCollectionDetailResponse.poster_path}`,
-										w780: `https://image.tmdb.org/t/p/w780/${getCollectionDetailResponse.poster_path}`,
-									}
+								? getPosterUrls(getCollectionDetailResponse.poster_path)
 								: null,
 							backdrop_urls: getCollectionDetailResponse.backdrop_path
-								? {
-										original: `https://image.tmdb.org/t/p/original/${getCollectionDetailResponse.backdrop_path}`,
-										w300: `https://image.tmdb.org/t/p/w300/${getCollectionDetailResponse.backdrop_path}`,
-										w780: `https://image.tmdb.org/t/p/w780/${getCollectionDetailResponse.backdrop_path}`,
-										w1280: `https://image.tmdb.org/t/p/w1280/${getCollectionDetailResponse.backdrop_path}`,
-									}
+								? getBackdropUrls(getCollectionDetailResponse.backdrop_path)
 								: null,
 						};
 
@@ -279,15 +269,7 @@ export class TmdbNode implements INodeType {
 						item.json = {
 							...getCompanyDetailResponse,
 							logo_urls: getCompanyDetailResponse.logo_path
-								? {
-										original: `https://image.tmdb.org/t/p/original/${getCompanyDetailResponse.logo_path}`,
-										w45: `https://image.tmdb.org/t/p/w45/${getCompanyDetailResponse.logo_path}`,
-										w92: `https://image.tmdb.org/t/p/w92/${getCompanyDetailResponse.logo_path}`,
-										w154: `https://image.tmdb.org/t/p/w154/${getCompanyDetailResponse.logo_path}`,
-										w185: `https://image.tmdb.org/t/p/w185/${getCompanyDetailResponse.logo_path}`,
-										w300: `https://image.tmdb.org/t/p/w300/${getCompanyDetailResponse.logo_path}`,
-										w500: `https://image.tmdb.org/t/p/w500/${getCompanyDetailResponse.logo_path}`,
-									}
+								? getLogoUrls(getCompanyDetailResponse.logo_path)
 								: null,
 						};
 
@@ -315,23 +297,10 @@ export class TmdbNode implements INodeType {
 							getMovieDetailResponse.belongs_to_collection = {
 								...getMovieDetailResponse.belongs_to_collection,
 								poster_urls: getMovieDetailResponse.belongs_to_collection.poster_path
-									? {
-											original: `https://image.tmdb.org/t/p/original/${getMovieDetailResponse.belongs_to_collection.poster_path}`,
-											w92: `https://image.tmdb.org/t/p/w92/${getMovieDetailResponse.belongs_to_collection.poster_path}`,
-											w154: `https://image.tmdb.org/t/p/w154/${getMovieDetailResponse.belongs_to_collection.poster_path}`,
-											w185: `https://image.tmdb.org/t/p/w185/${getMovieDetailResponse.belongs_to_collection.poster_path}`,
-											w342: `https://image.tmdb.org/t/p/w342/${getMovieDetailResponse.belongs_to_collection.poster_path}`,
-											w500: `https://image.tmdb.org/t/p/w500/${getMovieDetailResponse.belongs_to_collection.poster_path}`,
-											w780: `https://image.tmdb.org/t/p/w780/${getMovieDetailResponse.belongs_to_collection.poster_path}`,
-										}
+									? getPosterUrls(getMovieDetailResponse.belongs_to_collection.poster_path)
 									: null,
 								backdrop_urls: getMovieDetailResponse.belongs_to_collection.backdrop_path
-									? {
-											original: `https://image.tmdb.org/t/p/original/${getMovieDetailResponse.belongs_to_collection.backdrop_path}`,
-											w300: `https://image.tmdb.org/t/p/w300/${getMovieDetailResponse.belongs_to_collection.backdrop_path}`,
-											w780: `https://image.tmdb.org/t/p/w780/${getMovieDetailResponse.belongs_to_collection.backdrop_path}`,
-											w1280: `https://image.tmdb.org/t/p/w1280/${getMovieDetailResponse.belongs_to_collection.backdrop_path}`,
-										}
+									? getBackdropUrls(getMovieDetailResponse.belongs_to_collection.backdrop_path)
 									: null,
 							};
 						}
@@ -340,17 +309,7 @@ export class TmdbNode implements INodeType {
 							getMovieDetailResponse.production_companies =
 								getMovieDetailResponse.production_companies.map((company: any) => ({
 									...company,
-									logo_urls: company.logo_path
-										? {
-												original: `https://image.tmdb.org/t/p/original/${company.logo_path}`,
-												w45: `https://image.tmdb.org/t/p/w45/${company.logo_path}`,
-												w92: `https://image.tmdb.org/t/p/w92/${company.logo_path}`,
-												w154: `https://image.tmdb.org/t/p/w154/${company.logo_path}`,
-												w185: `https://image.tmdb.org/t/p/w185/${company.logo_path}`,
-												w300: `https://image.tmdb.org/t/p/w300/${company.logo_path}`,
-												w500: `https://image.tmdb.org/t/p/w500/${company.logo_path}`,
-											}
-										: null,
+									logo_urls: company.logo_path ? getLogoUrls(company.logo_path) : null,
 								}));
 						}
 
@@ -358,39 +317,18 @@ export class TmdbNode implements INodeType {
 							getMovieDetailResponse.images.backdrops =
 								getMovieDetailResponse.images?.backdrops?.map((backdrop: any) => ({
 									...backdrop,
-									urls: {
-										original: `https://image.tmdb.org/t/p/original/${backdrop.file_path}`,
-										w300: `https://image.tmdb.org/t/p/w300/${backdrop.file_path}`,
-										w780: `https://image.tmdb.org/t/p/w780/${backdrop.file_path}`,
-										w1280: `https://image.tmdb.org/t/p/w1280/${backdrop.file_path}`,
-									},
+									urls: getBackdropUrls(backdrop.file_path),
 								}));
 							getMovieDetailResponse.images.logos = getMovieDetailResponse.images?.logos?.map(
 								(logo: any) => ({
 									...logo,
-									urls: {
-										original: `https://image.tmdb.org/t/p/original/${logo.file_path}`,
-										w45: `https://image.tmdb.org/t/p/w45/${logo.file_path}`,
-										w92: `https://image.tmdb.org/t/p/w92/${logo.file_path}`,
-										w154: `https://image.tmdb.org/t/p/w154/${logo.file_path}`,
-										w185: `https://image.tmdb.org/t/p/w185/${logo.file_path}`,
-										w300: `https://image.tmdb.org/t/p/w300/${logo.file_path}`,
-										w500: `https://image.tmdb.org/t/p/w500/${logo.file_path}`,
-									},
+									urls: getLogoUrls(logo.file_path),
 								}),
 							);
 							getMovieDetailResponse.images.posters = getMovieDetailResponse.images?.posters?.map(
 								(poster: any) => ({
 									...poster,
-									urls: {
-										original: `https://image.tmdb.org/t/p/original/${poster.file_path}`,
-										w92: `https://image.tmdb.org/t/p/w92/${poster.file_path}`,
-										w154: `https://image.tmdb.org/t/p/w154/${poster.file_path}`,
-										w185: `https://image.tmdb.org/t/p/w185/${poster.file_path}`,
-										w342: `https://image.tmdb.org/t/p/w342/${poster.file_path}`,
-										w500: `https://image.tmdb.org/t/p/w500/${poster.file_path}`,
-										w780: `https://image.tmdb.org/t/p/w780/${poster.file_path}`,
-									},
+									urls: getPosterUrls(poster.file_path),
 								}),
 							);
 						}
@@ -398,27 +336,13 @@ export class TmdbNode implements INodeType {
 							getMovieDetailResponse.credits.cast = getMovieDetailResponse.credits.cast.map(
 								(cast: any) => ({
 									...cast,
-									profile_urls: cast.profile_path
-										? {
-												original: `https://image.tmdb.org/t/p/original/${cast.profile_path}`,
-												w45: `https://image.tmdb.org/t/p/w45/${cast.profile_path}`,
-												w185: `https://image.tmdb.org/t/p/w185/${cast.profile_path}`,
-												h632: `https://image.tmdb.org/t/p/h632/${cast.profile_path}`,
-											}
-										: null,
+									profile_urls: cast.profile_path ? getProfileUrls(cast.profile_path) : null,
 								}),
 							);
 							getMovieDetailResponse.credits.crew = getMovieDetailResponse.credits.crew.map(
 								(crew: any) => ({
 									...crew,
-									profile_urls: crew.profile_path
-										? {
-												original: `https://image.tmdb.org/t/p/original/${crew.profile_path}`,
-												w45: `https://image.tmdb.org/t/p/w45/${crew.profile_path}`,
-												w185: `https://image.tmdb.org/t/p/w185/${crew.profile_path}`,
-												h632: `https://image.tmdb.org/t/p/h632/${crew.profile_path}`,
-											}
-										: null,
+									profile_urls: crew.profile_path ? getProfileUrls(crew.profile_path) : null,
 								}),
 							);
 						}
@@ -426,23 +350,10 @@ export class TmdbNode implements INodeType {
 						item.json = {
 							...getMovieDetailResponse,
 							poster_urls: getMovieDetailResponse.poster_path
-								? {
-										original: `https://image.tmdb.org/t/p/original/${getMovieDetailResponse.poster_path}`,
-										w92: `https://image.tmdb.org/t/p/w92/${getMovieDetailResponse.poster_path}`,
-										w154: `https://image.tmdb.org/t/p/w154/${getMovieDetailResponse.poster_path}`,
-										w185: `https://image.tmdb.org/t/p/w185/${getMovieDetailResponse.poster_path}`,
-										w342: `https://image.tmdb.org/t/p/w342/${getMovieDetailResponse.poster_path}`,
-										w500: `https://image.tmdb.org/t/p/w500/${getMovieDetailResponse.poster_path}`,
-										w780: `https://image.tmdb.org/t/p/w780/${getMovieDetailResponse.poster_path}`,
-									}
+								? getPosterUrls(getMovieDetailResponse.poster_path)
 								: null,
 							backdrop_urls: getMovieDetailResponse.backdrop_path
-								? {
-										original: `https://image.tmdb.org/t/p/original/${getMovieDetailResponse.backdrop_path}`,
-										w300: `https://image.tmdb.org/t/p/w300/${getMovieDetailResponse.backdrop_path}`,
-										w780: `https://image.tmdb.org/t/p/w780/${getMovieDetailResponse.backdrop_path}`,
-										w1280: `https://image.tmdb.org/t/p/w1280/${getMovieDetailResponse.backdrop_path}`,
-									}
+								? getBackdropUrls(getMovieDetailResponse.backdrop_path)
 								: null,
 						};
 						break;
@@ -469,96 +380,28 @@ export class TmdbNode implements INodeType {
 							getPersonDetailResponse.combined_credits.cast =
 								getPersonDetailResponse.combined_credits.cast?.map((cast: any) => ({
 									...cast,
-									backdrop_urls: cast.backdrop_path
-										? {
-												original: `https://image.tmdb.org/t/p/original/${cast.backdrop_path}`,
-												w300: `https://image.tmdb.org/t/p/w300/${cast.backdrop_path}`,
-												w780: `https://image.tmdb.org/t/p/w780/${cast.backdrop_path}`,
-												w1280: `https://image.tmdb.org/t/p/w1280/${cast.backdrop_path}`,
-											}
-										: null,
-									poster_urls: cast.poster_path
-										? {
-												original: `https://image.tmdb.org/t/p/original/${cast.poster_path}`,
-												w92: `https://image.tmdb.org/t/p/w92/${cast.poster_path}`,
-												w154: `https://image.tmdb.org/t/p/w154/${cast.poster_path}`,
-												w185: `https://image.tmdb.org/t/p/w185/${cast.poster_path}`,
-												w342: `https://image.tmdb.org/t/p/w342/${cast.poster_path}`,
-												w500: `https://image.tmdb.org/t/p/w500/${cast.poster_path}`,
-												w780: `https://image.tmdb.org/t/p/w780/${cast.poster_path}`,
-											}
-										: null,
+									backdrop_urls: cast.backdrop_path ? getBackdropUrls(cast.backdrop_path) : null,
+									poster_urls: cast.poster_path ? getPosterUrls(cast.poster_path) : null,
 								}));
 							getPersonDetailResponse.combined_credits.crew =
 								getPersonDetailResponse.combined_credits.crew?.map((crew: any) => ({
 									...crew,
-									backdrop_urls: crew.backdrop_path
-										? {
-												original: `https://image.tmdb.org/t/p/original/${crew.backdrop_path}`,
-												w300: `https://image.tmdb.org/t/p/w300/${crew.backdrop_path}`,
-												w780: `https://image.tmdb.org/t/p/w780/${crew.backdrop_path}`,
-												w1280: `https://image.tmdb.org/t/p/w1280/${crew.backdrop_path}`,
-											}
-										: null,
-									poster_urls: crew.poster_path
-										? {
-												original: `https://image.tmdb.org/t/p/original/${crew.poster_path}`,
-												w92: `https://image.tmdb.org/t/p/w92/${crew.poster_path}`,
-												w154: `https://image.tmdb.org/t/p/w154/${crew.poster_path}`,
-												w185: `https://image.tmdb.org/t/p/w185/${crew.poster_path}`,
-												w342: `https://image.tmdb.org/t/p/w342/${crew.poster_path}`,
-												w500: `https://image.tmdb.org/t/p/w500/${crew.poster_path}`,
-												w780: `https://image.tmdb.org/t/p/w780/${crew.poster_path}`,
-											}
-										: null,
+									backdrop_urls: crew.backdrop_path ? getBackdropUrls(crew.backdrop_path) : null,
+									poster_urls: crew.poster_path ? getPosterUrls(crew.poster_path) : null,
 								}));
 						}
 						if (getPersonDetailResponse.movie_credits) {
 							getPersonDetailResponse.movie_credits.cast =
 								getPersonDetailResponse.movie_credits.cast?.map((cast: any) => ({
 									...cast,
-									backdrop_urls: cast.backdrop_path
-										? {
-												original: `https://image.tmdb.org/t/p/original/${cast.backdrop_path}`,
-												w300: `https://image.tmdb.org/t/p/w300/${cast.backdrop_path}`,
-												w780: `https://image.tmdb.org/t/p/w780/${cast.backdrop_path}`,
-												w1280: `https://image.tmdb.org/t/p/w1280/${cast.backdrop_path}`,
-											}
-										: null,
-									poster_urls: cast.poster_path
-										? {
-												original: `https://image.tmdb.org/t/p/original/${cast.poster_path}`,
-												w92: `https://image.tmdb.org/t/p/w92/${cast.poster_path}`,
-												w154: `https://image.tmdb.org/t/p/w154/${cast.poster_path}`,
-												w185: `https://image.tmdb.org/t/p/w185/${cast.poster_path}`,
-												w342: `https://image.tmdb.org/t/p/w342/${cast.poster_path}`,
-												w500: `https://image.tmdb.org/t/p/w500/${cast.poster_path}`,
-												w780: `https://image.tmdb.org/t/p/w780/${cast.poster_path}`,
-											}
-										: null,
+									backdrop_urls: cast.backdrop_path ? getBackdropUrls(cast.backdrop_path) : null,
+									poster_urls: cast.poster_path ? getPosterUrls(cast.poster_path) : null,
 								}));
 							getPersonDetailResponse.movie_credits.crew =
 								getPersonDetailResponse.movie_credits.crew?.map((crew: any) => ({
 									...crew,
-									backdrop_urls: crew.backdrop_path
-										? {
-												original: `https://image.tmdb.org/t/p/original/${crew.backdrop_path}`,
-												w300: `https://image.tmdb.org/t/p/w300/${crew.backdrop_path}`,
-												w780: `https://image.tmdb.org/t/p/w780/${crew.backdrop_path}`,
-												w1280: `https://image.tmdb.org/t/p/w1280/${crew.backdrop_path}`,
-											}
-										: null,
-									poster_urls: crew.poster_path
-										? {
-												original: `https://image.tmdb.org/t/p/original/${crew.poster_path}`,
-												w92: `https://image.tmdb.org/t/p/w92/${crew.poster_path}`,
-												w154: `https://image.tmdb.org/t/p/w154/${crew.poster_path}`,
-												w185: `https://image.tmdb.org/t/p/w185/${crew.poster_path}`,
-												w342: `https://image.tmdb.org/t/p/w342/${crew.poster_path}`,
-												w500: `https://image.tmdb.org/t/p/w500/${crew.poster_path}`,
-												w780: `https://image.tmdb.org/t/p/w780/${crew.poster_path}`,
-											}
-										: null,
+									backdrop_urls: crew.backdrop_path ? getBackdropUrls(crew.backdrop_path) : null,
+									poster_urls: crew.poster_path ? getPosterUrls(crew.poster_path) : null,
 								}));
 						}
 
@@ -566,48 +409,14 @@ export class TmdbNode implements INodeType {
 							getPersonDetailResponse.tv_credits.cast =
 								getPersonDetailResponse.tv_credits.cast?.map((cast: any) => ({
 									...cast,
-									backdrop_urls: cast.backdrop_path
-										? {
-												original: `https://image.tmdb.org/t/p/original/${cast.backdrop_path}`,
-												w300: `https://image.tmdb.org/t/p/w300/${cast.backdrop_path}`,
-												w780: `https://image.tmdb.org/t/p/w780/${cast.backdrop_path}`,
-												w1280: `https://image.tmdb.org/t/p/w1280/${cast.backdrop_path}`,
-											}
-										: null,
-									poster_urls: cast.poster_path
-										? {
-												original: `https://image.tmdb.org/t/p/original/${cast.poster_path}`,
-												w92: `https://image.tmdb.org/t/p/w92/${cast.poster_path}`,
-												w154: `https://image.tmdb.org/t/p/w154/${cast.poster_path}`,
-												w185: `https://image.tmdb.org/t/p/w185/${cast.poster_path}`,
-												w342: `https://image.tmdb.org/t/p/w342/${cast.poster_path}`,
-												w500: `https://image.tmdb.org/t/p/w500/${cast.poster_path}`,
-												w780: `https://image.tmdb.org/t/p/w780/${cast.poster_path}`,
-											}
-										: null,
+									backdrop_urls: cast.backdrop_path ? getBackdropUrls(cast.backdrop_path) : null,
+									poster_urls: cast.poster_path ? getPosterUrls(cast.poster_path) : null,
 								}));
 							getPersonDetailResponse.tv_credits.crew =
 								getPersonDetailResponse.tv_credits.crew?.map((crew: any) => ({
 									...crew,
-									backdrop_urls: crew.backdrop_path
-										? {
-												original: `https://image.tmdb.org/t/p/original/${crew.backdrop_path}`,
-												w300: `https://image.tmdb.org/t/p/w300/${crew.backdrop_path}`,
-												w780: `https://image.tmdb.org/t/p/w780/${crew.backdrop_path}`,
-												w1280: `https://image.tmdb.org/t/p/w1280/${crew.backdrop_path}`,
-											}
-										: null,
-									poster_urls: crew.poster_path
-										? {
-												original: `https://image.tmdb.org/t/p/original/${crew.poster_path}`,
-												w92: `https://image.tmdb.org/t/p/w92/${crew.poster_path}`,
-												w154: `https://image.tmdb.org/t/p/w154/${crew.poster_path}`,
-												w185: `https://image.tmdb.org/t/p/w185/${crew.poster_path}`,
-												w342: `https://image.tmdb.org/t/p/w342/${crew.poster_path}`,
-												w500: `https://image.tmdb.org/t/p/w500/${crew.poster_path}`,
-												w780: `https://image.tmdb.org/t/p/w780/${crew.poster_path}`,
-											}
-										: null,
+									backdrop_urls: crew.backdrop_path ? getBackdropUrls(crew.backdrop_path) : null,
+									poster_urls: crew.poster_path ? getPosterUrls(crew.poster_path) : null,
 								}));
 						}
 
@@ -615,24 +424,14 @@ export class TmdbNode implements INodeType {
 							getPersonDetailResponse.images.profiles =
 								getPersonDetailResponse.images?.profiles?.map((profile: any) => ({
 									...profile,
-									urls: {
-										original: `https://image.tmdb.org/t/p/original/${profile.file_path}`,
-										w45: `https://image.tmdb.org/t/p/w45/${profile.file_path}`,
-										w185: `https://image.tmdb.org/t/p/w185/${profile.file_path}`,
-										h632: `https://image.tmdb.org/t/p/h632/${profile.file_path}`,
-									},
+									urls: getProfileUrls(profile.file_path),
 								}));
 						}
 
 						item.json = {
 							...getPersonDetailResponse,
 							profile_urls: getPersonDetailResponse.profile_path
-								? {
-										original: `https://image.tmdb.org/t/p/original/${getPersonDetailResponse.profile_path}`,
-										w45: `https://image.tmdb.org/t/p/w45/${getPersonDetailResponse.profile_path}`,
-										w185: `https://image.tmdb.org/t/p/w185/${getPersonDetailResponse.profile_path}`,
-										h632: `https://image.tmdb.org/t/p/h632/${getPersonDetailResponse.profile_path}`,
-									}
+								? getProfileUrls(getPersonDetailResponse.profile_path)
 								: null,
 						};
 						break;
@@ -661,12 +460,7 @@ export class TmdbNode implements INodeType {
 								(createdBy: any) => ({
 									...createdBy,
 									profile_urls: createdBy.profile_path
-										? {
-												original: `https://image.tmdb.org/t/p/original/${createdBy.profile_path}`,
-												w45: `https://image.tmdb.org/t/p/w45/${createdBy.profile_path}`,
-												w185: `https://image.tmdb.org/t/p/w185/${createdBy.profile_path}`,
-												h632: `https://image.tmdb.org/t/p/h632/${createdBy.profile_path}`,
-											}
+										? getProfileUrls(createdBy.profile_path)
 										: null,
 								}),
 							);
@@ -676,51 +470,21 @@ export class TmdbNode implements INodeType {
 							getTvDetailResponse.production_companies =
 								getTvDetailResponse.production_companies.map((company: any) => ({
 									...company,
-									logo_urls: company.logo_path
-										? {
-												original: `https://image.tmdb.org/t/p/original/${company.logo_path}`,
-												w45: `https://image.tmdb.org/t/p/w45/${company.logo_path}`,
-												w92: `https://image.tmdb.org/t/p/w92/${company.logo_path}`,
-												w154: `https://image.tmdb.org/t/p/w154/${company.logo_path}`,
-												w185: `https://image.tmdb.org/t/p/w185/${company.logo_path}`,
-												w300: `https://image.tmdb.org/t/p/w300/${company.logo_path}`,
-												w500: `https://image.tmdb.org/t/p/w500/${company.logo_path}`,
-											}
-										: null,
+									logo_urls: company.logo_path ? getLogoUrls(company.logo_path) : null,
 								}));
 						}
 
 						if (getTvDetailResponse.networks) {
 							getTvDetailResponse.networks = getTvDetailResponse.networks.map((network: any) => ({
 								...network,
-								logo_urls: network.logo_path
-									? {
-											original: `https://image.tmdb.org/t/p/original/${network.logo_path}`,
-											w45: `https://image.tmdb.org/t/p/w45/${network.logo_path}`,
-											w92: `https://image.tmdb.org/t/p/w92/${network.logo_path}`,
-											w154: `https://image.tmdb.org/t/p/w154/${network.logo_path}`,
-											w185: `https://image.tmdb.org/t/p/w185/${network.logo_path}`,
-											w300: `https://image.tmdb.org/t/p/w300/${network.logo_path}`,
-											w500: `https://image.tmdb.org/t/p/w500/${network.logo_path}`,
-										}
-									: null,
+								logo_urls: network.logo_path ? getLogoUrls(network.logo_path) : null,
 							}));
 						}
 
 						if (getTvDetailResponse.seasons) {
 							getTvDetailResponse.seasons = getTvDetailResponse.seasons.map((season: any) => ({
 								...season,
-								poster_urls: season.poster_path
-									? {
-											original: `https://image.tmdb.org/t/p/original/${season.poster_path}`,
-											w92: `https://image.tmdb.org/t/p/w92/${season.poster_path}`,
-											w154: `https://image.tmdb.org/t/p/w154/${season.poster_path}`,
-											w185: `https://image.tmdb.org/t/p/w185/${season.poster_path}`,
-											w342: `https://image.tmdb.org/t/p/w342/${season.poster_path}`,
-											w500: `https://image.tmdb.org/t/p/w500/${season.poster_path}`,
-											w780: `https://image.tmdb.org/t/p/w780/${season.poster_path}`,
-										}
-									: null,
+								poster_urls: season.poster_path ? getLogoUrls(season.poster_path) : null,
 							}));
 						}
 
@@ -728,40 +492,19 @@ export class TmdbNode implements INodeType {
 							getTvDetailResponse.images.backdrops = getTvDetailResponse.images?.backdrops?.map(
 								(backdrop: any) => ({
 									...backdrop,
-									urls: {
-										original: `https://image.tmdb.org/t/p/original/${backdrop.file_path}`,
-										w300: `https://image.tmdb.org/t/p/w300/${backdrop.file_path}`,
-										w780: `https://image.tmdb.org/t/p/w780/${backdrop.file_path}`,
-										w1280: `https://image.tmdb.org/t/p/w1280/${backdrop.file_path}`,
-									},
+									urls: getBackdropUrls(backdrop.file_path),
 								}),
 							);
 							getTvDetailResponse.images.logos = getTvDetailResponse.images?.logos?.map(
 								(logo: any) => ({
 									...logo,
-									urls: {
-										original: `https://image.tmdb.org/t/p/original/${logo.file_path}`,
-										w45: `https://image.tmdb.org/t/p/w45/${logo.file_path}`,
-										w92: `https://image.tmdb.org/t/p/w92/${logo.file_path}`,
-										w154: `https://image.tmdb.org/t/p/w154/${logo.file_path}`,
-										w185: `https://image.tmdb.org/t/p/w185/${logo.file_path}`,
-										w300: `https://image.tmdb.org/t/p/w300/${logo.file_path}`,
-										w500: `https://image.tmdb.org/t/p/w500/${logo.file_path}`,
-									},
+									urls: getLogoUrls(logo.file_path),
 								}),
 							);
 							getTvDetailResponse.images.posters = getTvDetailResponse.images?.posters?.map(
 								(poster: any) => ({
 									...poster,
-									urls: {
-										original: `https://image.tmdb.org/t/p/original/${poster.file_path}`,
-										w92: `https://image.tmdb.org/t/p/w92/${poster.file_path}`,
-										w154: `https://image.tmdb.org/t/p/w154/${poster.file_path}`,
-										w185: `https://image.tmdb.org/t/p/w185/${poster.file_path}`,
-										w342: `https://image.tmdb.org/t/p/w342/${poster.file_path}`,
-										w500: `https://image.tmdb.org/t/p/w500/${poster.file_path}`,
-										w780: `https://image.tmdb.org/t/p/w780/${poster.file_path}`,
-									},
+									urls: getPosterUrls(poster.file_path),
 								}),
 							);
 						}
@@ -769,27 +512,13 @@ export class TmdbNode implements INodeType {
 							getTvDetailResponse.credits.cast = getTvDetailResponse.credits.cast.map(
 								(cast: any) => ({
 									...cast,
-									profile_urls: cast.profile_path
-										? {
-												original: `https://image.tmdb.org/t/p/original/${cast.profile_path}`,
-												w45: `https://image.tmdb.org/t/p/w45/${cast.profile_path}`,
-												w185: `https://image.tmdb.org/t/p/w185/${cast.profile_path}`,
-												h632: `https://image.tmdb.org/t/p/h632/${cast.profile_path}`,
-											}
-										: null,
+									profile_urls: cast.profile_path ? getProfileUrls(cast.profile_path) : null,
 								}),
 							);
 							getTvDetailResponse.credits.crew = getTvDetailResponse.credits.crew.map(
 								(crew: any) => ({
 									...crew,
-									profile_urls: crew.profile_path
-										? {
-												original: `https://image.tmdb.org/t/p/original/${crew.profile_path}`,
-												w45: `https://image.tmdb.org/t/p/w45/${crew.profile_path}`,
-												w185: `https://image.tmdb.org/t/p/w185/${crew.profile_path}`,
-												h632: `https://image.tmdb.org/t/p/h632/${crew.profile_path}`,
-											}
-										: null,
+									profile_urls: crew.profile_path ? getProfileUrls(crew.profile_path) : null,
 								}),
 							);
 						}
@@ -798,12 +527,7 @@ export class TmdbNode implements INodeType {
 							getTvDetailResponse.last_episode_to_air = {
 								...getTvDetailResponse.last_episode_to_air,
 								still_urls: getTvDetailResponse.last_episode_to_air.still_path
-									? {
-											original: `https://image.tmdb.org/t/p/original/${getTvDetailResponse.last_episode_to_air.still_path}`,
-											w92: `https://image.tmdb.org/t/p/w92/${getTvDetailResponse.last_episode_to_air.still_path}`,
-											w185: `https://image.tmdb.org/t/p/w185/${getTvDetailResponse.last_episode_to_air.still_path}`,
-											w300: `https://image.tmdb.org/t/p/w300/${getTvDetailResponse.last_episode_to_air.still_path}`,
-										}
+									? getStillUrls(getTvDetailResponse.last_episode_to_air.still_path)
 									: null,
 							};
 						}
@@ -812,12 +536,7 @@ export class TmdbNode implements INodeType {
 							getTvDetailResponse.next_episode_to_air = {
 								...getTvDetailResponse.next_episode_to_air,
 								still_urls: getTvDetailResponse.next_episode_to_air.still_path
-									? {
-											original: `https://image.tmdb.org/t/p/original/${getTvDetailResponse.next_episode_to_air.still_path}`,
-											w92: `https://image.tmdb.org/t/p/w92/${getTvDetailResponse.next_episode_to_air.still_path}`,
-											w185: `https://image.tmdb.org/t/p/w185/${getTvDetailResponse.next_episode_to_air.still_path}`,
-											w300: `https://image.tmdb.org/t/p/w300/${getTvDetailResponse.next_episode_to_air.still_path}`,
-										}
+									? getStillUrls(getTvDetailResponse.next_episode_to_air.still_path)
 									: null,
 							};
 						}
@@ -825,23 +544,10 @@ export class TmdbNode implements INodeType {
 						item.json = {
 							...getTvDetailResponse,
 							poster_urls: getTvDetailResponse.poster_path
-								? {
-										original: `https://image.tmdb.org/t/p/original/${getTvDetailResponse.poster_path}`,
-										w92: `https://image.tmdb.org/t/p/w92/${getTvDetailResponse.poster_path}`,
-										w154: `https://image.tmdb.org/t/p/w154/${getTvDetailResponse.poster_path}`,
-										w185: `https://image.tmdb.org/t/p/w185/${getTvDetailResponse.poster_path}`,
-										w342: `https://image.tmdb.org/t/p/w342/${getTvDetailResponse.poster_path}`,
-										w500: `https://image.tmdb.org/t/p/w500/${getTvDetailResponse.poster_path}`,
-										w780: `https://image.tmdb.org/t/p/w780/${getTvDetailResponse.poster_path}`,
-									}
+								? getPosterUrls(getTvDetailResponse.poster_path)
 								: null,
 							backdrop_urls: getTvDetailResponse.backdrop_path
-								? {
-										original: `https://image.tmdb.org/t/p/original/${getTvDetailResponse.backdrop_path}`,
-										w300: `https://image.tmdb.org/t/p/w300/${getTvDetailResponse.backdrop_path}`,
-										w780: `https://image.tmdb.org/t/p/w780/${getTvDetailResponse.backdrop_path}`,
-										w1280: `https://image.tmdb.org/t/p/w1280/${getTvDetailResponse.backdrop_path}`,
-									}
+								? getBackdropUrls(getTvDetailResponse.backdrop_path)
 								: null,
 						};
 						break;
